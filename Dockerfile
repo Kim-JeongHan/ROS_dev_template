@@ -79,14 +79,17 @@ RUN apt install -y python3.6 python3.6-dev
 # ModuleNotFoundError: No module named 'distutils.cmd' 
 RUN apt -y --reinstall install python3.6-distutils python3-catkin-tools
 # AttributeError: type object 'OpenGL_accelerate.arraydatatype.HandlerRegistry' has no attribute 'reduce_cython'
-# RUN pip install virtualenv empy
 
-RUN ln -sf /usr/bin/python3.6 /usr/bin/python
-RUN ln -sf /usr/bin/python3.6 /usr/bin/python3
+# RUN sudo ln -sf /usr/bin/python3.6 /usr/bin/python
+# RUN sudo ln -sf /usr/bin/python3.6 /usr/bin/python3
+
+RUN pip install virtualenv
 
 USER ${UNAME}
-# RUN /bin/bash -c "virtualenv vdx36 --python=python3.6"
-# RUN echo "source ~/vdx36/bin/activate" >> ~/.bashrc
+RUN /bin/bash -c "virtualenv vdx36 --python=python3.6"
+RUN ~/vdx36/bin/pip install --upgrade --force-reinstall numpy
+RUN ~/vdx36/bin/pip install --upgrade --force-reinstall netifaces
+RUN echo "source ~/vdx36/bin/activate" >> ~/.bashrc
 RUN echo "source /opt/ros/noetic/setup.bash" >> ~/.bashrc
 RUN echo "export ROS_HOSTNAME=localhost" >> ~/.bashrc
 RUN echo "export ROS_MASTER_URI=http://localhost:11311" >> ~/.bashrc
@@ -102,47 +105,46 @@ RUN /bin/bash -c '. /opt/ros/noetic/setup.bash; cd /home/${UNAME}/catkin_ws/src;
 RUN /bin/bash -c '. /opt/ros/noetic/setup.bash; cd /home/${UNAME}/catkin_ws; catkin_make'
 RUN echo "source /home/${UNAME}/catkin_ws/devel/setup.bash" >> ~/.bashrc
 RUN /bin/bash -c "source ~/.bashrc"
-RUN pip install empy catkin_pkg numpy PyYAML rospkg opencv-python matplotlib
+RUN ~/vdx36/bin/pip install empy catkin_pkg numpy PyYAML rospkg opencv-python matplotlib
 
-USER ${UNAME}
-RUN mkdir -p -m 0700 /home/${UNAME}/.ssh \
-  && ssh-keyscan github.com >> /home/${UNAME}/.ssh/known_hosts
-ADD id_rsa /home/${UNAME}/.ssh/id_rsa
-USER root
-RUN chown roboe:root /home/${UNAME}/.ssh/id_rsa
-RUN chmod 600 /home/${UNAME}/.ssh/id_rsa
-RUN chmod 644 /home/${UNAME}/.ssh/known_hosts
+# USER ${UNAME}
+# RUN mkdir -p -m 0700 /home/${UNAME}/.ssh \
+#   && ssh-keyscan github.com >> /home/${UNAME}/.ssh/known_hosts
+# ADD id_rsa /home/${UNAME}/.ssh/id_rsa
+# USER root
+# RUN chown roboe:root /home/${UNAME}/.ssh/id_rsa
+# RUN chmod 600 /home/${UNAME}/.ssh/id_rsa
+# RUN chmod 644 /home/${UNAME}/.ssh/known_hosts
 
-# roscore 이슈 netifaces==0.11.0, numpy==1.19.5
-USER ${UNAME}
-RUN pip install netifaces --upgrade 
-RUN pip install numpy --upgrade
+# RUN ssh-keygen -t rsa -C "jisung.ko@roboetech.com"
+RUN sudo apt -y install openssh-client
+RUN mkdir -p -m 0700 /home/${UNAME}/.ssh
+RUN ssh-keygen -q -t rsa -C "jisung.ko@roboetech.com"
 
 WORKDIR /home/${UNAME}/catkin_ws/src
 RUN git clone git@github.com:roboetech/roboenet.git
-RUN git clone -b noetic-devel --single-branch https://github.com/doosan-robotics/doosan-robot
-RUN git clone https://github.com/wjwwood/serial.git
-RUN rosdep install --from-paths doosan-robot --ignore-src --rosdistro noetic -r -y
+# RUN git clone -b noetic-devel --single-branch https://github.com/doosan-robotics/doosan-robot
+# RUN git clone https://github.com/wjwwood/serial.git
+# RUN rosdep install --from-paths doosan-robot --ignore-src --rosdistro noetic -r -y
 
-WORKDIR /home/${UNAME}/catkin_ws/src/roboenet
-RUN sh install.sh all
-RUN /bin/bash -c '. /opt/ros/noetic/setup.bash; cd /home/roboe/catkin_ws; catkin_make'
 
-RUN wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/cuda-ubuntu2004.pin
-RUN sudo mv cuda-ubuntu2004.pin /etc/apt/preferences.d/cuda-repository-pin-600
-RUN sudo apt-key adv --fetch-keys https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/3bf863cc.pub
-RUN sudp apt install python3-apt --reinstall
+# WORKDIR /home/${UNAME}/catkin_ws/src/roboenet
+# RUN sh install.sh all
+# RUN /bin/bash -c '. /opt/ros/noetic/setup.bash; cd /home/roboe/catkin_ws; catkin_make'
 
-RUN sudo add-apt-repository "deb https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/ /"
-RUN sudo apt update 
-RUN sudo DEBIAN_FRONTEND=noninteractive apt install -y cuda-11-3
+# RUN wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/cuda-ubuntu2004.pin
+# RUN sudo mv cuda-ubuntu2004.pin /etc/apt/preferences.d/cuda-repository-pin-600
+# RUN sudo apt-key adv --fetch-keys https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/3bf863cc.pub
+# RUN sudo add-apt-repository "deb https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/ /"
+# RUN sudo apt update 
+# RUN sudo DEBIAN_FRONTEND=noninteractive apt install -y cuda-11-3
 
-RUN echo 'export PATH=/usr/local/cuda-11.3/bin:$PATH' >> ~/.bashrc
-RUN echo 'export LD_LIBRARY_PATH=/usr/local/cuda-11.3/lib64:$LD_LIBRARY_PATH' >> ~/.bashrc
+# RUN echo 'export PATH=/usr/local/cuda-11.3/bin:$PATH' >> ~/.bashrc
+# RUN echo 'export LD_LIBRARY_PATH=/usr/local/cuda-11.3/lib64:$LD_LIBRARY_PATH' >> ~/.bashrc
 
-ADD cudnn-11.3-linux-x64-v8.2.1.32.tgz /home/${UNAME}/catkin_ws/etc/
-RUN sudo cp ~/catkin_ws/etc/cuda/include/* /usr/local/cuda-11.3/include
-RUN sudo cp -P ~/catkin_ws/etc/cuda/lib64/* /usr/local/cuda-11.3/lib64
-RUN sudo chmod a+r /usr/local/cuda-11.3/lib64/libcudnn*
+# ADD cudnn-11.3-linux-x64-v8.2.1.32.tgz /home/${UNAME}/catkin_ws/etc/
+# RUN sudo cp ~/catkin_ws/etc/cuda/include/* /usr/local/cuda-11.3/include
+# RUN sudo cp -P ~/catkin_ws/etc/cuda/lib64/* /usr/local/cuda-11.3/lib64
+# RUN sudo chmod a+r /usr/local/cuda-11.3/lib64/libcudnn*
 
-RUN sudo DEBIAN_FRONTEND=noninteractive apt -y install terminator
+# RUN sudo DEBIAN_FRONTEND=noninteractive apt -y install terminator
