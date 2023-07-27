@@ -18,12 +18,11 @@ RUN --mount=type=cache,target=/var/cache/apt,id=apt \
     build-essential \
     ccache \
     cmake \
-    locv  \
     lld \
     python3-colcon-common-extensions \
     python3-colcon-coveragepy-result \
     python3-colcon-mixin \
-    git c fuse3 libfuse2 libqt5svg5-dev \
+    git libcanberra-gtk-module libcanberra-gtk3-module fuse3 liblibcanberra-gtk-module libcanberra-gtk3-modulefuse2 libqt5svg5-dev \
     python3-pip python3-opencv python3-tk python3-pyqt5.qtwebengine \
     && rm -rf /var/lib/apt/lists/*
 
