@@ -42,7 +42,7 @@ While developing a tool on top of another tool can come with challenges,
 some may prefer to at least have some simple aliases to reduce the typing boilerplate.
 ```shell
 alias builddev="export UID=$(id -u) export GID=$(id -g); docker compose build"
-alias rundev="docker compose run development"
+alias rundev="docker compose run dev"
 ```
 
 # References
