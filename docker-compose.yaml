@@ -75,14 +75,14 @@ services:
         - USERNAME=${USERNAME:-devuser}
     volumes:
       # Mount the source code
-      - ./tb3_autonomy:/overlay_ws/src/tb3_autonomy:rw
-      - ./tb3_worlds:/overlay_ws/src/tb3_worlds:rw
+      - ./${REPO}:/overlay_ws/src/${REPO}:rw
       # Mount colcon build artifacts for faster rebuilds
       - ./.colcon/build/:/overlay_ws/build/:rw
       - ./.colcon/install/:/overlay_ws/install/:rw
       - ./.colcon/log/:/overlay_ws/log/:rw
     user: ${USERNAME:-devuser}
-    command: sleep infinity
+    container_name: ${USER}-${REPO}-dev
+    command: bash -c "bash"
 
   # Runs basic TurtleBot3 simulation
   # sim:
