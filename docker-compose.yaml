@@ -15,13 +15,14 @@ version: "3.9"
 services:
   # Base image containing dependencies.
   base:
-    image: turtlebot3_behavior:base
     build:
       context: .
       dockerfile: docker/Dockerfile
       args:
-        ROS_DISTRO: humble
+        - REPO=${REPO}
+        - ROS_DISTRO=${ROS_DISTRO:-humble}
       target: base
+    image: ${REPO}-dev:${ROS_DISTRO}
     # Interactive shell
     stdin_open: true
     tty: true
@@ -37,11 +38,22 @@ services:
       - DISPLAY=${DISPLAY}
       - QT_X11_NO_MITSHM=1
       - NVIDIA_DRIVER_CAPABILITIES=all
+      # Needed to run ROS 2 nodes
+      - ROS_DOMAIN_ID=${ROS_DOMAIN_ID:-0}
+      - TERM=xterm-256color
     volumes:
       # Allows graphical programs in the container.
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
       - ${XAUTHORITY:-$HOME/.Xauthority}:/root/.Xauthority
-
+      # Mount devices and configuration files
+      - /dev:/dev
+      # Mount ssh keys and git config
+      - ~/.ssh:${HOME}/.ssh:ro
+      - ~/.gitconfig:${HOME}/.gitconfig:ro
+      # Mount group and passwd files for user permissions
+      - /etc/group:/etc/group:ro
+      - /etc/passwd:/etc/passwd:ro
+      - /etc/shadow:/etc/shadow:ro
   # Overlay image containing the example source code.
   overlay:
     extends: base
