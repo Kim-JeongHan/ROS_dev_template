@@ -95,9 +95,6 @@ ARG GID=${GID}
 RUN --mount=type=cache,target=/var/cache/apt,id=apt \
     apt-get update && apt-get install -y --no-install-recommends \
     gdb gdbserver nano \
-    clang-14 \
-    clang-format-14 \
-    clang-tidy-14 \
     git \
     openssh-client \
     python3-pip \
