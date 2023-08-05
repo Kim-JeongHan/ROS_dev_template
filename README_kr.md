@@ -8,7 +8,7 @@
 ```
 export UID=$(id -u) export GID=$(id -g); docker compose build
 ```
-또한 만약 dockerfile에 수정사항이 생겼거나, docker-compose에 수정사항이 생긴경우 똑같은 방식으로 다시build해 주면된다. 
+또한 만약 dockerfile에 수정사항이 생겼거나, docker-compose에 수정사항이 생긴경우 똑같은 방식으로 다시build해 주면된다.
 
 이때는 기존이미지가 <none>으로 바뀌고, 새로운 이미지가 update된다.
 
@@ -45,7 +45,7 @@ volume에 mapping해놓은 리스트이다. 따로 volume mapping을 하고 싶�
 - git configuration
 - host credentials
 - X11 connection
-- 
+-
 #### git
 
 gitconfig를 volume mapping해놓았기 때문에 local gitconfig환경을 docker container안에서 사용할 수 있다.

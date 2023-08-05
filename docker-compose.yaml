@@ -87,4 +87,3 @@ services:
     user: ${USERNAME:-devuser}
     container_name: ${USER}-${REPO}-dev
     command: bash -c "bash"
-
