@@ -2,7 +2,7 @@
 ARG ROS_DISTRO=humble
 
 ########################################
-# Base Image for TurtleBot3 Simulation #
+# Base Image for project #
 ########################################
 FROM osrf/ros:${ROS_DISTRO}-desktop-full as base
 ARG REPO
@@ -27,7 +27,8 @@ RUN --mount=type=cache,target=/var/cache/apt,id=apt \
     && rm -rf /var/lib/apt/lists/*
 
 # Install additional Python modules
-RUN pip3 install matplotlib transforms3d
+RUN pip3 install matplotlib transforms3d \
+    pytest pytest-cov pytest-mock pytest-xdist
 
 # Use Cyclone DDS as middleware
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -65,7 +66,7 @@ COPY ./docker/entrypoint.sh /
 ENTRYPOINT [ "/entrypoint.sh" ]
 
 ###########################################
-# Overlay Image for TurtleBot3 Simulation #
+# Overlay Image for  project #
 ###########################################
 FROM base AS overlay
 
@@ -76,6 +77,9 @@ COPY ./${REPO}/ ./src/${REPO}/
 RUN source /upstream_ws/install/setup.bash \
     && rosdep install --from-paths src --ignore-src --rosdistro ${ROS_DISTRO} -y \
     && colcon build --symlink-install
+
+# Copy the VSCode settings
+COPY ./.vscode /overlay_ws/.vscode
 
 # Set up the entrypoint
 COPY ./docker/entrypoint.sh /
