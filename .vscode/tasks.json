@@ -191,14 +191,14 @@
                 "label": "new ament_cmake package",
                 "detail": "Create a new ROS cpp package from a template.",
                 "type": "shell",
-                "command": "ros2 pkg create --destination-directory src/gole --build-type ament_cmake ${input:package}",
+                "command": "ros2 pkg create --destination-directory src --build-type ament_cmake ${input:package}",
                 "problemMatcher": []
             },
             {
                 "label": "new ament_python package",
                 "detail": "Create a new ROS python package from a template.",
                 "type": "shell",
-                "command": "ros2 pkg create --destination-directory src/gole --build-type ament_python ${input:package}",
+                "command": "ros2 pkg create --destination-directory src --build-type ament_python ${input:package}",
                 "problemMatcher": []
             },
             {

@@ -70,6 +70,5 @@
         ".vscode",
         ".vscode-insiders",
         ".devcontainer/devcontainer.json"
-    ],
-    "cmake.sourceDirectory": "/home/joenghan/gole_core_ros/gole/ros2_template_pkg/extern/googletest/googlemock"
+    ]
 }
