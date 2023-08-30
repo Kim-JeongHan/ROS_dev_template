@@ -1,9 +1,9 @@
 # ROS distribution to use
-ARG ROS_DISTRO=humble
+ARG ROS_DISTRO=noetic
 
-########################################
-# Base Image for project #
-########################################
+##########################################
+# Base Image for ros1 template workspace #
+##########################################
 FROM osrf/ros:${ROS_DISTRO}-desktop-full as base
 ARG REPO
 ENV ROS_DISTRO=${ROS_DISTRO}
@@ -15,13 +15,12 @@ ARG DEBIAN_FRONTEND=noninteractive
 RUN --mount=type=cache,target=/var/cache/apt,id=apt \
     apt-get update && apt-get upgrade -y \
     && apt-get install -q -y --no-install-recommends \
-    build-essential \
+    build-essential libboost-all-dev \
+    udev \
+    usbutils \
     ccache \
     cmake \
     lld \
-    python3-colcon-common-extensions \
-    python3-colcon-coveragepy-result \
-    python3-colcon-mixin \
     git libcanberra-gtk-module libcanberra-gtk3-module fuse3 libqt5svg5-dev \
     python3-pip python3-opencv python3-tk python3-pyqt5.qtwebengine \
     && rm -rf /var/lib/apt/lists/*
@@ -30,29 +29,27 @@ RUN --mount=type=cache,target=/var/cache/apt,id=apt \
 RUN pip3 install matplotlib transforms3d \
     pytest pytest-cov pytest-mock pytest-xdist
 
-# Use Cyclone DDS as middleware
+# Update the package list and install ROS1 packages
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    ros-${ROS_DISTRO}-rmw-cyclonedds-cpp
-ENV RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
+    ros-${ROS_DISTRO}-rqt
 
-# Create Colcon workspace with external dependencies
+# Create catkin workspace with external dependencies
 RUN mkdir -p /upstream_ws/src
 WORKDIR /upstream_ws/src
-COPY dependencies.repos .
-RUN vcs import < dependencies.repos
+RUN source /opt/ros/${ROS_DISTRO}/setup.bash \
+    && catkin_init_workspace \
+    && git clone -b ${ROS_DISTRO}-devel https://github.com/ROBOTIS-GIT/turtlebot3.git \
+    && git clone -b ${ROS_DISTRO}-devel https://github.com/ROBOTIS-GIT/turtlebot3_msgs.git \
+    && git clone -b ${ROS_DISTRO}-devel https://github.com/ROBOTIS-GIT/turtlebot3_simulations.git
 
-# Build the base Colcon workspace, installing dependencies first.
+# Build the base catkin workspace, installing dependencies first.
 WORKDIR /upstream_ws
 RUN source /opt/ros/${ROS_DISTRO}/setup.bash \
     && rosdep update && apt-get update -y \
     && rosdep install --from-paths src --ignore-src --rosdistro ${ROS_DISTRO} -y \
-    && rm -rf /var/lib/apt/lists/* \
-    && colcon build --mixin release lld
+    && catkin_make -DCMAKE_BUILD_TYPE=Release  \
+    && rm -rf /var/lib/apt/lists/* 
 
-# Download Groot2 AppImage and place it in the home folder.
-# WORKDIR /root/
-# RUN curl -o Groot2.AppImage https://s3.us-west-1.amazonaws.com/download.behaviortree.dev/groot2_linux_installer/Groot2-v1.0.1-x86_64.AppImage \
-#     && chmod a+x Groot2.AppImage
 
 # Remove display warnings
 RUN mkdir /tmp/runtime-root
@@ -65,18 +62,18 @@ WORKDIR /upstream_ws
 COPY ./docker/entrypoint.sh /
 ENTRYPOINT [ "/entrypoint.sh" ]
 
-###########################################
-# Overlay Image for  project #
-###########################################
+#############################################
+# Overlay Image for ros1 template workspace #
+#############################################
 FROM base AS overlay
 
-# Create an overlay Colcon workspace
+# Create an overlay catkin workspace
 RUN mkdir -p /overlay_ws/src
 WORKDIR /overlay_ws
 COPY ./${REPO}/ ./src/${REPO}/
-RUN source /upstream_ws/install/setup.bash \
-    && rosdep install --from-paths src --ignore-src --rosdistro ${ROS_DISTRO} -y \
-    && colcon build --symlink-install
+RUN source /upstream_ws/devel/setup.bash \
+    && catkin_make -DCMAKE_BUILD_TYPE=Release \
+    && rosdep install --from-paths src --ignore-src --rosdistro ${ROS_DISTRO} -y 
 
 # Copy the VSCode settings
 COPY ./.vscode /overlay_ws/.vscode
@@ -121,11 +118,7 @@ RUN groupadd --gid $GID $USERNAME \
 # Set the ownership of the overlay workspace to the new user
 RUN chown -R ${UID}:${GID} /overlay_ws/
 
-# Move Groot2 to new user's home directory and ensure it can be run
-# RUN groupadd fuse \
-#     && usermod -aG fuse ${USERNAME}
-# RUN mv /root/Groot2.AppImage /home/${USERNAME} \
-#     && chown ${UID}:${GID} /home/${USERNAME}/Groot2.AppImage
+
 
 # Set the user and source entrypoint in the user's .bashrc file
 USER ${USERNAME}

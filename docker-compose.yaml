@@ -76,10 +76,9 @@ services:
     volumes:
       # Mount the source code
       - ./${REPO}:/overlay_ws/src/${REPO}:rw
-      # Mount colcon build artifacts for faster rebuilds
-      - ./.colcon/build/:/overlay_ws/build/:rw
-      - ./.colcon/install/:/overlay_ws/install/:rw
-      - ./.colcon/log/:/overlay_ws/log/:rw
+      # Mount catkin build artifacts for faster rebuilds
+      - ./.catkin/build/:/overlay_ws/build/:rw
+      - ./.catkin/devel/:/overlay_ws/devel/:rw
       # Mount docker directory for faster edits to Dockerfile
       - ./docker:/overlay_ws/docker:rw
       # Mount .devcontainer directory for faster edits to devcontainer.json

@@ -1055,9 +1055,9 @@ poetry.toml
 # LSP config files
 pyrightconfig.json
 
-### ROS2 ###
-install/
-log/
+### ROS1 ###
+build/
+devel/
 
 # Ignore generated docs
 *.dox
@@ -1232,8 +1232,6 @@ AMENT_IGNORE
 # Virtualenv
 # http://iamzed.com/2009/05/07/a-primer-on-virtualenv/
 [Bb]in
-[Ii]nclude
-# [Ll]ib
 [Ll]ib64
 [Ll]ocal
 [Ss]cripts
@@ -1305,6 +1303,6 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 
-.colcon/
+.catkin/
 
 # End of https://www.toptal.com/developers/gitignore/api/git,linux,windows,macos,ros2,visualstudiocode,jetbrains+all,c++,python,matlab,kicad,c,tex,vim,venv,pycharm+all,clion+all,latex,ninja,cmake,bazel,node
