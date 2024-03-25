@@ -1,0 +1,23 @@
+[submodule "roboe_gpu/integration"]
+	path = roboe_gpu/integration
+	url = git@github.com:roboe-git/integration
+	branch = HEAD
+[submodule "roboe_gpu/ui"]
+	path = roboe_gpu/ui
+	url = git@github.com:roboe-git/ui
+	branch = HEAD
+[submodule "roboe_gpu/roboe-pm"]
+	path = roboe_gpu/roboe-pm
+	url = git@github.com:roboe-git/roboe-pm
+[submodule "roboe_gpu/manipulator"]
+	path = roboe_gpu/manipulator
+	url = git@github.com:roboe-git/manipulator
+[submodule "roboe_gpu/ml-network"]
+	path = roboe_gpu/ml-network
+	url = git@github.com:roboe-git/ml-network
+[submodule "roboe_gpu/mobile"]
+	path = roboe_gpu/mobile
+	url = git@github.com:roboe-git/mobile
+[submodule "roboe_gpu/roboesim"]
+	path = roboe_gpu/roboesim
+	url = git@github.com:roboe-git/roboesim
