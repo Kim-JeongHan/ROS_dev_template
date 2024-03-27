@@ -1,13 +1,18 @@
 {
-    "editor.tabSize": 8,
-    "editor.rulers": [
-        100
-    ],
+    // editor settings
+    "editor.tabSize": 4,
+    "editor.rulers": [100],
+    "editor.minimap.enabled": false,
+    "editor.mouseWheelZoom": true,
+    "editor.renderControlCharacters": true,
+    // Set the file associations for ros files
     "files.associations": {
         "*.repos": "yaml",
         "*.world": "xml",
         "*.xacro": "xml"
     },
+    "terminal.integrated.scrollback": 1000000,
+
     "python.analysis.extraPaths": [
         "/opt/ros/noetic/lib/python3/dist-packages/"
     ],
@@ -15,11 +20,15 @@
     "python.autoComplete.extraPaths": [
         "/opt/ros/noetic/lib/python3/dist-packages/"
     ],
+    "[python]": {
+        "editor.defaultFormatter": "ms-python.python"
+    },
     // Use the system installed version of autopep8
     "python.formatting.autopep8Path": "/usr/bin/autopep8",
     "python.formatting.autopep8Args": [
         "--max-line-length=100"
     ],
+    "cmake.configureOnOpen": false,
     "C_Cpp.default.intelliSenseMode": "linux-gcc-x86",
     "C_Cpp.formatting": "disabled",
     "[cpp]": {
@@ -33,6 +42,7 @@
         "**/install": true,
         "**/log": true
     },
+    "ros.distro": "noetic",
     "cSpell.words": [
         "RTPS",
         "athackst",
