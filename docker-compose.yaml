@@ -14,7 +14,7 @@
 version: "3.9"
 services:
   gpu:
-    build: 
+    build:
       context: .
       dockerfile: docker/Dockerfile
       target: gpu
@@ -87,6 +87,7 @@ services:
         - UID=${UID:-1000}
         - GID=${UID:-1000}
         - USERNAME=${USERNAME:-devuser}
+        - PYTHON_VERSION=${PYTHON_VERSION}
     volumes:
       # Mount the source code
       - ./${REPO}:/overlay_ws/src/${REPO}:rw

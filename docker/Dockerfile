@@ -51,7 +51,6 @@ RUN --mount=type=cache,target=/var/cache/apt,id=apt \
     lld \
     curl \
     git \
-    python3-pip \
     git libcanberra-gtk-module libcanberra-gtk3-module fuse3 libqt5svg5-dev \
     libosmesa6-dev \
     libgl1-mesa-glx \
@@ -65,6 +64,7 @@ RUN --mount=type=cache,target=/var/cache/apt,id=apt \
     libxext6 \
     libx11-6 \
     psmisc \
+    python3-pip \
     && rm -rf /var/lib/apt/lists/*
 
 
@@ -85,8 +85,8 @@ RUN pip3 install --ignore-installed empy \
     colorlog \
     dynamixel-sdk \
     empy==3.3.4 \
-    ultralytics
-RUN pip3 install --ignore-installed    scikit-image \
+    ultralytics \
+    cikit-image \
     dill \
     pybullet \
     pandas \
@@ -96,10 +96,6 @@ RUN pip3 install --ignore-installed    scikit-image \
     h5py \
     roboticstoolbox-python
     # zivid==2.10.1.2.10.1 \
-RUN pip3 install \
-    torch torchvision
-RUN pip3 install torchaudio --extra-index-url https://download.pytorch.org/whl/cu113 
-
 
 # Update the package list and install ROS1 packages
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -143,24 +139,7 @@ RUN mkdir -p /overlay_ws/src
 WORKDIR /overlay_ws
 COPY ./${REPO}/ ./src/${REPO}/
 
-WORKDIR /overlay_ws/src/${REPO}/ui
-
-WORKDIR /overlay_ws/src/${REPO}/ui/robot-api
-RUN touch .env \
-    && echo DATABASE_URL="file:./data/mydb.sqlite" > .env \
-    && echo PORT=8000 >> .env \
-    && echo JWT_SECRET="=jt6Bb@Tfei$(BwN$0A)8c/f<#~+k?v" >> .env 
-WORKDIR /overlay_ws/src/${REPO}/ui/robot-web
-RUN touch .env \
-    && echo NEXT_PUBLIC_API_URL='http://localhost:8000' > .env \
-    && echo NEXT_PUBLIC_ROBOT_SERIAL='MOROW00001' >> .env
-WORKDIR /overlay_ws/src/${REPO}/ui
-CMD ["./rebuid.sh" ]
-
-
-
-WORKDIR /overlay_ws
-RUN source /upstream_ws/devel/setup.bash 
+RUN source /upstream_ws/devel/setup.bash
     # && catkin_make -DCMAKE_BUILD_TYPE=Release \
     # && rosdep install --from-paths src --ignore-src --rosdistro ${ROS_DISTRO} -y 
 
@@ -186,7 +165,6 @@ RUN --mount=type=cache,target=/var/cache/apt,id=apt \
     apt-get update && apt-get install -y --no-install-recommends \
     gdb gdbserver nano \
     openssh-client \
-    python3-pip \
     vim \
     wget \
     unzip \
@@ -197,6 +175,18 @@ RUN --mount=type=cache,target=/var/cache/apt,id=apt \
     terminator \
     python-is-python3 \
     && rm -rf /var/lib/apt/lists/*
+
+# Install additional apt packages for python3.10
+RUN add-apt-repository ppa:deadsnakes/ppa \
+    && apt-get update \
+    && apt-get install -y python3.10
+
+
+# set alternative python version
+ARG PYTHON_VERSION=python3.10
+RUN update-alternatives --install /usr/bin/python python /usr/bin/python3.8 1 \
+    && update-alternatives --install /usr/bin/python python /usr/bin/python3.10 2 \
+    && update-alternatives --set python /usr/bin/${PYTHON_VERSION}
 
 # Create new user and home directory
 RUN groupadd --gid $GID $USERNAME \
@@ -227,6 +217,14 @@ RUN curl -L https://npmjs.com/install.sh | bash
 #     && npm install -g pm2 \
 #     && npm install -gnodemon \
 #     && npm install -g ts-node
+# RUN /bin/sh -c echo 'DATABASE_URL=file:./data/mydb.sqlite'          > /overlay_ws/src/${REPO}/ui/robot-app/.env \    
+#             && echo 'PORT=8000'                                    >> /overlay_ws/src/${REPO}/ui/robot-app/.env \
+#             && echo 'JWT_SECRET="=jt6Bb@Tfei$(BwN$0A)8c/f<#~+k?v"' >> /overlay_ws/src/${REPO}/ui/robot-app/.env \
+# WORKDIR /overlay_ws/src/${REPO}/ui/robot-web
+# RUN /bin/sh -c echo 'NEXT_PUBLIC_API_URL=http://localhost:8000'  > /overlay_ws/src/${REPO}/ui/robot-web/.env \
+#             && echo 'NEXT_PUBLIC_ROBOT_SERIAL=MOROW00001'       >> /overlay_ws/src/${REPO}/ui/robot-web/.env \
+# WORKDIR /overlay_ws/src/${REPO}/ui
+# CMD ["./rebuid.sh" ]
 
 
 WORKDIR /overlay_ws
