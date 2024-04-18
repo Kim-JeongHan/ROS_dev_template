@@ -7,22 +7,29 @@
 	    "customizations": {
 		    "vscode": {
 			    "extensions": [
-				    "althack.ament-task-provider",
-				    "betwo.b2-catkin-tools",
-				    "DotJoshJohnson.xml",
-				    "ms-azuretools.vscode-docker",
-				    "ms-iot.vscode-ros",
-				    "ms-python.python",
-				    "ms-vscode.cpptools",
-				    "redhat.vscode-yaml",
-				    "smilerobotics.urdf",
-				    "streetsidesoftware.code-spell-checker",
-				    "twxs.cmake",
-				    "yzhang.markdown-all-in-one",
-				    "zachflower.uncrustify",
-				    "redhat.vscode-xml"
+					"ms-vscode.cpptools", 						// C/C++ extension
+					"twxs.cmake", 								// CMake extension
+					"ms-vscode.cmake-tools", 					// CMake Tools extension
+					"ms-python.python",							// Python extension
+					"smilerobotics.urdf",						// URDF extension
+					"DotJoshJohnson.xml",						// XML extension
+					"redhat.vscode-yaml",						// YAML extension
+					"yzhang.markdown-all-in-one",				// Markdown All in One extension
+					"ybaumes.highlight-trailing-white-spaces",	// Highlight Trailing White Spaces extension
+					"msfukui.eof-mark",							// EOF Mark extension
+					"aaron-bond.better-comments",				// Better Comments extension
+					"ms-iot.vscode-ros",						// ROS extension
+					"althack.ament-task-provider",
+					"betwo.b2-catkin-tools",
+					"ms-azuretools.vscode-docker",
+					"ms-vscode.cpptools",
+					"redhat.vscode-yaml",
+					"smilerobotics.urdf",
+					"streetsidesoftware.code-spell-checker",
+					"twxs.cmake",
+					"yzhang.markdown-all-in-one",
+					"zachflower.uncrustify"
 			    ]
 		    }
 	    }
     }
-    
