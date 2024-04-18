@@ -8,6 +8,12 @@
 DOCKER_VOLUMES="
 --volume="/tmp/.X11-unix:/tmp/.X11-unix:rw" \
 --volume="${XAUTHORITY:-$HOME/.Xauthority}:/root/.Xauthority" \
+--volume="/dev:/dev" \
+--volume="~/.ssh:${HOME}/.ssh:ro" \
+--volume="~/.gitconfig:${HOME}/.gitconfig:ro" \
+--volume="/etc/group:/etc/group:ro" \
+--volume="/etc/passwd:/etc/passwd:ro" \
+--volume="/etc/shadow:/etc/shadow:ro" \
 "
 DOCKER_ENV_VARS="
 --env="TURTLEBOT3_MODEL=waffle_pi" \

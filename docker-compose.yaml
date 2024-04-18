@@ -11,24 +11,10 @@
 # To open an interactive shell to a running container:
 #   docker exec -it <container_name> bash
 
-version: "3.9"
+version: "3.8"
 services:
-  gpu:
-    build: 
-      context: .
-      dockerfile: docker/Dockerfile
-      target: gpu
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: 1
-              capabilities: [gpu]
-    image: ${REPO}-gpu:${ROS_DISTRO}
   # Base image containing dependencies.
   base:
-    extends: gpu
     build:
       context: .
       dockerfile: docker/Dockerfile
@@ -67,36 +53,89 @@ services:
       - /etc/passwd:/etc/passwd:ro
       - /etc/shadow:/etc/shadow:ro
   # Overlay image containing the example source code.
-  overlay:
+  gpu:
     extends: base
-    image: ${REPO}-overlay:${ROS_DISTRO}
     build:
       context: .
       dockerfile: docker/Dockerfile
-      target: overlay
-
-  # Developer container
-  dev:
-    extends: overlay
-    image: ${REPO}-dev:${ROS_DISTRO}
+      target: gpu
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    image: ${REPO}-gpu:${ROS_DISTRO}
+  cpu:
+    extends: base
     build:
       context: .
       dockerfile: docker/Dockerfile
-      target: dev
+      target: cpu
+    image: ${REPO}-cpu:${ROS_DISTRO}
+  gpu_dev:
+    extends:
+      service: gpu
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+      target: gpu-dev
       args:
         - UID=${UID:-1000}
         - GID=${UID:-1000}
         - USERNAME=${USERNAME:-devuser}
+    image: ${REPO}-gpu-dev:${ROS_DISTRO}
     volumes:
+      # Allows graphical programs in the container.
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - ${XAUTHORITY:-$HOME/.Xauthority}:/root/.Xauthority
       # Mount the source code
-      - ./${REPO}:/overlay_ws/src/${REPO}:rw
+      - ./${REPO}:/home/${USERNAME:-devuser}/catkin_ws/src/${REPO}:rw
       # Mount catkin build artifacts for faster rebuilds
-      - ./.catkin/build/:/overlay_ws/build/:rw
-      - ./.catkin/devel/:/overlay_ws/devel/:rw
+      - ./.catkin/build/:/home/${USERNAME:-devuser}/catkin_ws/build/:rw
+      - ./.catkin/devel/:/home/${USERNAME:-devuser}/catkin_ws/devel/:rw
       # Mount docker directory for faster edits to Dockerfile
-      - ./docker:/overlay_ws/docker:rw
       # Mount .devcontainer directory for faster edits to devcontainer.json
-      - ./.devcontainer:/overlay_ws/.devcontainer:rw
+      - ./.devcontainer:/home/${USERNAME:-devuser}/catkin_ws/.devcontainer:rw
     user: ${USERNAME:-devuser}
-    container_name: ${USER}-${REPO}-dev
     command: bash -c "bash"
+  gpu_prod:
+    extends: gpu
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+      target: gpu-prod
+    image: ${REPO}-gpu-prod:${ROS_DISTRO}
+  cpu_dev:
+    extends: cpu
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+      target: cpu-dev
+      args:
+        - UID=${UID:-1000}
+        - GID=${UID:-1000}
+        - USERNAME=${USERNAME:-devuser}
+    image: ${REPO}-cpu-dev:${ROS_DISTRO}
+    volumes:
+      # Allows graphical programs in the container.
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - ${XAUTHORITY:-$HOME/.Xauthority}:/root/.Xauthority
+      # # Mount the source code
+      # - ./${REPO}:/home/${USERNAME:-devuser}/catkin_ws/src/${REPO}:rw
+      # # Mount catkin build artifacts for faster rebuilds
+      # - ./.catkin/build/:/home/${USERNAME:-devuser}/catkin_ws/build/:rw
+      # - ./.catkin/devel/:/home/${USERNAME:-devuser}/catkin_ws/devel/:rw
+      # # Mount docker directory for faster edits to Dockerfile
+      # # Mount .devcontainer directory for faster edits to devcontainer.json
+      # - ./.devcontainer:/home/${USERNAME:-devuser}/catkin_ws/.devcontainer:rw
+    user: ${USERNAME:-devuser}
+    command: bash -c "bash"
+  cpu_prod:
+    extends: cpu
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+      target: cpu-prod
+    image: ${REPO}-cpu-prod:${ROS_DISTRO}
