@@ -6,10 +6,10 @@ source /opt/ros/${ROS_DISTRO}/setup.bash
 echo "Sourced ROS 1 ${ROS_DISTRO}"
 
 # Source the base workspace, if built
-if [ -f /upstream_ws/devel/setup.bash ]
+if [ -f /opt/${WORKDIR}/devel/setup.bash ]
 then
-  source /upstream_ws/devel/setup.bash
-  echo "Sourced upstream_ws"
+  source /opt/${WORKDIR}/devel/setup.bash
+  echo "Sourced base workspace"
 fi
 
 # Source the overlay workspace, if built

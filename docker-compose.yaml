@@ -85,19 +85,17 @@ services:
         - UID=${UID:-1000}
         - GID=${UID:-1000}
         - USERNAME=${USERNAME:-devuser}
+        - WORKDIR=${WORKDIR}
     image: ${REPO}-gpu-dev:${ROS_DISTRO}
     volumes:
       # Allows graphical programs in the container.
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
       - ${XAUTHORITY:-$HOME/.Xauthority}:/root/.Xauthority
       # Mount the source code
-      - ./${REPO}:/home/${USERNAME:-devuser}/catkin_ws/src/${REPO}:rw
+      - ./${REPO}:/opt/${WORKDIR}/src/${REPO}:rw
       # Mount catkin build artifacts for faster rebuilds
-      - ./.catkin/build/:/home/${USERNAME:-devuser}/catkin_ws/build/:rw
-      - ./.catkin/devel/:/home/${USERNAME:-devuser}/catkin_ws/devel/:rw
-      # Mount docker directory for faster edits to Dockerfile
-      # Mount .devcontainer directory for faster edits to devcontainer.json
-      - ./.devcontainer:/home/${USERNAME:-devuser}/catkin_ws/.devcontainer:rw
+      - ./.catkin/build/:/opt/${WORKDIR}/build/:rw
+      - ./.catkin/devel/:/opt/${WORKDIR}/devel/:rw
     user: ${USERNAME:-devuser}
     command: bash -c "bash"
   gpu_prod:
@@ -117,19 +115,17 @@ services:
         - UID=${UID:-1000}
         - GID=${UID:-1000}
         - USERNAME=${USERNAME:-devuser}
+        - WORKDIR=${WORKDIR}
     image: ${REPO}-cpu-dev:${ROS_DISTRO}
     volumes:
       # Allows graphical programs in the container.
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
       - ${XAUTHORITY:-$HOME/.Xauthority}:/root/.Xauthority
-      # # Mount the source code
-      # - ./${REPO}:/home/${USERNAME:-devuser}/catkin_ws/src/${REPO}:rw
-      # # Mount catkin build artifacts for faster rebuilds
-      # - ./.catkin/build/:/home/${USERNAME:-devuser}/catkin_ws/build/:rw
-      # - ./.catkin/devel/:/home/${USERNAME:-devuser}/catkin_ws/devel/:rw
-      # # Mount docker directory for faster edits to Dockerfile
-      # # Mount .devcontainer directory for faster edits to devcontainer.json
-      # - ./.devcontainer:/home/${USERNAME:-devuser}/catkin_ws/.devcontainer:rw
+      # Mount the source code
+      - ./${REPO}:/opt/${WORKDIR}/src/${REPO}:rw
+      # Mount catkin build artifacts for faster rebuilds
+      - ./.catkin/build/:/opt/${WORKDIR}/build/:rw
+      - ./.catkin/devel/:/opt/${WORKDIR}/devel/:rw
     user: ${USERNAME:-devuser}
     command: bash -c "bash"
   cpu_prod:

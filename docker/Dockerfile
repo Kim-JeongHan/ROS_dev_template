@@ -36,16 +36,41 @@ RUN cd /etc/apt && \
 RUN --mount=type=cache,target=/var/cache/apt,id=apt \
     apt-get update && apt-get upgrade -y \
     && apt-get install -q -y --no-install-recommends \
-    build-essential libboost-all-dev \
+    build-essential libboost-all-dev  \
+    python3-catkin-tools \
+    udev \
+    usbutils \
+    ccache \
+    cmake \
+    net-tools ssh \
+    lld \
+    curl \
+    git \
+    git libcanberra-gtk-module libcanberra-gtk3-module fuse3 libqt5svg5-dev \
+    libosmesa6-dev \
+    libgl1-mesa-glx \
+    libgl1-mesa-dri \
+    libglfw3 \
+    mesa-utils \
+    libglvnd0 \
+    libgl1 \
+    libglx0 \
+    libegl1 \
+    libxext6 \
+    libx11-6 \
+    psmisc \
+    python3-pip \
+    software-properties-common \
     && rm -rf /var/lib/apt/lists/*
 
-# TODO : dependecy install
-# RUN python3 -m pip install --upgrade pip
-# # Install additional Python modules
-# RUN pip3 install --ignore-installed empy \
-#     catkin_pkg \
-#     numpy==1.23.5 
-
+RUN python3 -m pip install --upgrade pip
+RUN pip3 install --ignore-installed empy \
+    catkin_pkg
+# Install Additional ROS packages
+RUN --mount=type=cache,target=/var/cache/apt,id=apt \
+    apt-get update && apt-get upgrade -y \
+    && apt-get install -q -y --no-install-recommends \
+    ros-${ROS_DISTRO}-rviz 
 
 
 # Remove display warnings
@@ -54,7 +79,8 @@ ENV XDG_RUNTIME_DIR "/tmp/runtime-root"
 RUN chmod -R 0700 /tmp/runtime-root
 ENV NO_AT_BRIDGE 1
 
-
+COPY ./docker/entrypoint.sh /
+ENTRYPOINT ["/entrypoint.sh"]
 #################################
 # gpu Image for roboe workspace #
 #################################
@@ -67,6 +93,14 @@ ENV NVIDIA_VISIBLE_DEVICES=all
 #################################
 FROM base as cpu
 
+######################################
+# cpu prod Image for roboe workspace #
+######################################
+FROM cpu as cpu-prod
+
+WORKDIR /opt
+# TODO : Install Roboe git
+
 
 #####################################
 # cpu dev Image for roboe workspace #
@@ -76,7 +110,16 @@ FROM cpu as cpu-dev
 ARG USERNAME
 ARG UID=${UID}
 ARG GID=${GID}
+ARG WORKDIR
+ENV WORKDIR=${WORKDIR}
+ARG PYTHON_VERSION=python3.8
 
+RUN add-apt-repository ppa:deadsnakes/ppa \
+    && apt-get update \
+    && apt-get install -y python3.10 
+RUN update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.8 1 \
+    && update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.10 2 \
+    && update-alternatives --set python3 /usr/bin/${PYTHON_VERSION}
 
 # Create new user and home directory
 RUN groupadd --gid $GID $USERNAME \
@@ -86,26 +129,27 @@ RUN groupadd --gid $GID $USERNAME \
     && mkdir -p /home/${USERNAME} \
     && chown -R ${UID}:${GID} /home/${USERNAME}
 
-WORKDIR /home/${USERNAME}
-# RUN mkdir -p /home/${USERNAME}/catkin_ws/src 
-    # && catkin_init_workspace /home/${USERNAME}/catkin_ws/src
+    RUN mkdir -p /opt/${WORKDIR}/src \
+    && chown -R ${UID}:${GID} /opt/${WORKDIR} \
+    && source /opt/ros/${ROS_DISTRO}/setup.bash \
+    && catkin_init_workspace /opt/${WORKDIR}/src
 
-WORKDIR /home/${USERNAME}/catkin_ws
+WORKDIR /opt/${WORKDIR}
 # TODO : Install Roboe git
 # RUN repo init -u ssh://xn--id-tf2j006a@gerrit.roboetech.com:29418/manifest -b roboe_m_release -m roboe_m_release.xml 
 
 # Copy the VSCode settings
-COPY ./.vscode /overlay_ws/.vscode
+COPY ./.vscode /opt/${WORKDIR}/.vscode
 USER ${USERNAME}
-
+RUN echo "source /entrypoint.sh" >> /home/${USERNAME}/.bashrc
 ######################################
-# cpu prod Image for roboe workspace #
+# gpu prod Image for roboe workspace #
 ######################################
-FROM cpu as cpu-prod
+FROM gpu as gpu-prod
 
 WORKDIR /opt
 # TODO : Install Roboe git
-# RU
+# RUN
 
 
 #####################################
@@ -116,6 +160,16 @@ FROM gpu as gpu-dev
 ARG USERNAME=devuser
 ARG UID=${UID}
 ARG GID=${GID}
+ARG WORKDIR
+ENV WORKDIR=${WORKDIR}
+ARG PYTHON_VERSION=python3.8
+
+RUN add-apt-repository ppa:deadsnakes/ppa \
+    && apt-get update \
+    && apt-get install -y python3.10 
+RUN update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.8 1 \
+    && update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.10 2 \
+    && update-alternatives --set python3 /usr/bin/${PYTHON_VERSION}
 
 
 # Create new user and home directory
@@ -126,23 +180,16 @@ RUN groupadd --gid $GID $USERNAME \
     && mkdir -p /home/${USERNAME} \
     && chown -R ${UID}:${GID} /home/${USERNAME}
 
-WORKDIR /home/${USERNAME}
-# RUN mkdir -p /home/${USERNAME}/catkin_ws/src \
-#     && catkin_init_workspace /home/${USERNAME}/catkin_ws/src
+RUN mkdir -p /opt/${WORKDIR}/src \
+    && chown -R ${UID}:${GID} /opt/${WORKDIR} \
+    && source /opt/ros/${ROS_DISTRO}/setup.bash \
+    && catkin_init_workspace /opt/${WORKDIR}/src
 
-WORKDIR /home/${USERNAME}/catkin_ws
+WORKDIR /opt/${WORKDIR}
 # TODO : Install Roboe git
 # RUN repo init -u ssh://xn--id-tf2j006a@gerrit.roboetech.com:29418/manifest -b roboe_m_release -m roboe_m_release.xml 
 
 # Copy the VSCode settings
-COPY ./.vscode /overlay_ws/.vscode
+COPY ./.vscode /opt/${WORKDIR}/.vscode
 USER ${USERNAME}
-
-######################################
-# gpu prod Image for roboe workspace #
-######################################
-FROM gpu as gpu-prod
-
-WORKDIR /opt
-# TODO : Install Roboe git
-# RUN
+RUN echo "source /entrypoint.sh" >> /home/${USERNAME}/.bashrc
