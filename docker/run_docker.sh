@@ -1,10 +1,4 @@
 #!/bin/bash
-# Sample script to run a command in a Docker container
-#
-# Usage Example:
-# ./run_docker.sh turtlebot3_behavior:overlay "ros2 launch turtlebot3_gazebo turtlebot3_world.launch.py"
-
-# Define Docker volumes and environment variables
 DOCKER_VOLUMES="
 --volume="/tmp/.X11-unix:/tmp/.X11-unix:rw" \
 --volume="${XAUTHORITY:-$HOME/.Xauthority}:/root/.Xauthority" \
