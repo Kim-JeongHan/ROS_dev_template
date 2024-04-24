@@ -59,13 +59,13 @@ services:
       context: .
       dockerfile: docker/Dockerfile
       target: gpu
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: 1
-              capabilities: [gpu]
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: 1
+    #           capabilities: [gpu]
     image: ${REPO}-gpu:${ROS_DISTRO}
   cpu:
     extends: base

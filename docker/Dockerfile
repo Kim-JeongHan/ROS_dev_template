@@ -180,6 +180,22 @@ RUN groupadd --gid $GID $USERNAME \
     && mkdir -p /home/${USERNAME} \
     && chown -R ${UID}:${GID} /home/${USERNAME}
 
+WORKDIR /home/${USERNAME}
+ENV NVM_VERSION v0.39.7
+ENV NODE_VERSION 18.17.0
+ENV NVM_DIR /home/${USERNAME}/.nvm
+RUN mkdir -p $NVM_DIR
+
+RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
+RUN /bin/bash -c "source $NVM_DIR/nvm.sh \
+    && nvm install $NODE_VERSION \
+    && nvm alias default $NODE_VERSION \
+    && nvm use default"
+ENV NODE_PATH $NVM_DIR/v$NODE_VERSION/lib/node_modules
+ENV PATH $NVM_DIR/versions/node/v$NODE_VERSION/bin:$PATH
+RUN curl -L https://npmjs.com/install.sh | bash
+    
+
 RUN mkdir -p /opt/${WORKDIR}/src \
     && chown -R ${UID}:${GID} /opt/${WORKDIR} \
     && source /opt/ros/${ROS_DISTRO}/setup.bash \
