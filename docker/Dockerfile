@@ -187,10 +187,10 @@ ENV NVM_DIR /home/${USERNAME}/.nvm
 RUN mkdir -p $NVM_DIR
 
 RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
-RUN /bin/bash -c "source $NVM_DIR/nvm.sh \
+RUN source $NVM_DIR/nvm.sh \
     && nvm install $NODE_VERSION \
     && nvm alias default $NODE_VERSION \
-    && nvm use default"
+    && nvm use default
 ENV NODE_PATH $NVM_DIR/v$NODE_VERSION/lib/node_modules
 ENV PATH $NVM_DIR/versions/node/v$NODE_VERSION/bin:$PATH
 RUN curl -L https://npmjs.com/install.sh | bash
@@ -208,4 +208,4 @@ WORKDIR /opt/${WORKDIR}
 # Copy the VSCode settings
 COPY ./.vscode /opt/${WORKDIR}/.vscode
 USER ${USERNAME}
-RUN echo "source /entrypoint.sh" >> /home/${USERNAME}/.bashrc
+RUN echo -e "source /entrypoint.sh\n\source $NVM_DIR/nvm.sh" >> /home/${USERNAME}/.bashrc

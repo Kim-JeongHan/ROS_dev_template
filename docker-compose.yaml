@@ -1,16 +1,3 @@
-# Docker Compose file for TurtleBot3 Behavior Examples
-#
-# Usage:
-#
-# To build the images:
-#   docker compose build
-#
-# To start up a specific service by name:
-#   docker compose up <service_name>
-#
-# To open an interactive shell to a running container:
-#   docker exec -it <container_name> bash
-
 version: "3.8"
 services:
   # Base image containing dependencies.
@@ -22,7 +9,7 @@ services:
         - REPO=${REPO}
         - ROS_DISTRO=${ROS_DISTRO}
       target: base
-    image: ${REPO}-base:${ROS_DISTRO}
+    image: ${HUB_REPO}/base:${VER}
     # Interactive shell
     stdin_open: true
     tty: true
@@ -53,27 +40,28 @@ services:
       - /etc/passwd:/etc/passwd:ro
       - /etc/shadow:/etc/shadow:ro
   # Overlay image containing the example source code.
+
   gpu:
     extends: base
     build:
       context: .
       dockerfile: docker/Dockerfile
       target: gpu
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: 1
-              capabilities: [gpu]
-    image: ${REPO}-gpu:${ROS_DISTRO}
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: 1
+    #           capabilities: [gpu]
+    image: ${HUB_REPO}/base-gpu:${VER}
   cpu:
     extends: base
     build:
       context: .
       dockerfile: docker/Dockerfile
       target: cpu
-    image: ${REPO}-cpu:${ROS_DISTRO}
+    image: ${HUB_REPO}/base-cpu:${VER}
   gpu_dev:
     extends:
       service: gpu
@@ -86,7 +74,7 @@ services:
         - GID=${UID:-1000}
         - USERNAME=${USERNAME:-devuser}
         - WORKDIR=${WORKDIR}
-    image: ${REPO}-gpu-dev:${ROS_DISTRO}
+    image: ${HUB_REPO}/base-gpu-dev:${VER}
     volumes:
       # Allows graphical programs in the container.
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
@@ -98,13 +86,13 @@ services:
       - ./.catkin/devel/:/opt/${WORKDIR}/devel/:rw
     user: ${USERNAME:-devuser}
     command: bash -c "bash"
-  gpu_prod:
-    extends: gpu
-    build:
-      context: .
-      dockerfile: docker/Dockerfile
-      target: gpu-prod
-    image: ${REPO}-gpu-prod:${ROS_DISTRO}
+#  gpu_prod:
+#    extends: gpu
+#    build:
+#      context: .
+#      dockerfile: docker/Dockerfile
+#      target: gpu-prod
+#    image: ${REPO}-gpu-prod:${ROS_DISTRO}
   cpu_dev:
     extends: cpu
     build:
@@ -116,7 +104,7 @@ services:
         - GID=${UID:-1000}
         - USERNAME=${USERNAME:-devuser}
         - WORKDIR=${WORKDIR}
-    image: ${REPO}-cpu-dev:${ROS_DISTRO}
+    image: ${HUB_REPO}/base-cpu-dev:${VER}
     volumes:
       # Allows graphical programs in the container.
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
@@ -128,10 +116,10 @@ services:
       - ./.catkin/devel/:/opt/${WORKDIR}/devel/:rw
     user: ${USERNAME:-devuser}
     command: bash -c "bash"
-  cpu_prod:
-    extends: cpu
-    build:
-      context: .
-      dockerfile: docker/Dockerfile
-      target: cpu-prod
-    image: ${REPO}-cpu-prod:${ROS_DISTRO}
+#  cpu_prod:
+#    extends: cpu
+#    build:
+#      context: .
+#      dockerfile: docker/Dockerfile
+#      target: cpu-prod
+#    image: ${REPO}-cpu-prod:${ROS_DISTRO}
