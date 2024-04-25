@@ -13,10 +13,23 @@ if [ ! -d  .catkin ]; then
 fi
 
 if [ ! -d ${HOME}/.bin ]; then
+    echo "[INFO}Installing repo"
     mkdir -p ${HOME}/.bin
     PATH="${HOME}/.bin:${PATH}"
     curl https://storage.googleapis.com/git-repo-downloads/repo > ~/.bin/repo
     chmod a+x ~/.bin/repo
+fi
+
+if apt list | grep -q "nvidia-docker2"; then
+    echo "[INFO}nvidia-docker2 is already installed"
+else
+    echo "[INFO}Installing nvidia-docker2"
+    distribution=$(. /etc/os-release;echo $ID$VERSION_ID) \
+    && curl -s -L https://nvidia.github.io/nvidia-docker/gpgkey | sudo apt-key add - \
+    && curl -s -L https://nvidia.github.io/nvidia-docker/$distribution/nvidia-docker.list | sudo tee /etc/apt/sources.list.d/nvidia-docker.list
+    sudo apt update && sudo apt install -y nvidia-docker2
+    sudo systemctl restart docker
+    sudo rm -rf /etc/apt/sources.list.d/nvidia-docker.list
 fi
 
 
@@ -42,10 +55,10 @@ DOCKER_ARGS=${DOCKER_VOLUMES}" "${DOCKER_ENV_VARS}
 
 # Check if the container exists
 if docker ps -a --format '{{.Names}}' | grep -q ${CONTAINER}; then
-    echo "Attaching to the existing container"
+    echo "[INFO}Attaching to the existing container"
     docker start ${CONTAINER}
     docker attach ${CONTAINER}
 else
-    echo "Running the command"
+    echo "[INFO}Running the command"
     docker run -it --name ${CONTAINER} --net=host --gpus=all --ipc=host --privileged ${DOCKER_ARGS} "${HUB_REPO}/${IMAGE}:${VER}" bash -c "bash"
 fi
