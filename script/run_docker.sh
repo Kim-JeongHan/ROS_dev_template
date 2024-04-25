@@ -60,7 +60,7 @@ if docker ps -a --format '{{.Names}}' | grep -q ${CONTAINER}; then
     docker attach ${CONTAINER}
 else
     echo "[INFO}Running the command"
-    if echo ${CONTAINER} | gtrp -q "cpu"; then
+    if echo ${CONTAINER} | grep -q "cpu"; then
         docker run -it --name ${CONTAINER} --net=host --ipc=host --privileged ${DOCKER_ARGS} "${HUB_REPO}/${IMAGE}:${VER}" bash -c "bash"
     else
         docker run -it --name ${CONTAINER} --net=host --gpus=all --ipc=host --privileged ${DOCKER_ARGS} "${HUB_REPO}/${IMAGE}:${VER}" bash -c "bash"
