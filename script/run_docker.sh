@@ -47,5 +47,5 @@ if docker ps -a --format '{{.Names}}' | grep -q ${CONTAINER}; then
     docker attach ${CONTAINER}
 else
     echo "Running the command"
-    docker run -it --name ${CONTAINER} --net=host --ipc=host --privileged ${DOCKER_ARGS} "${HUB_REPO}/${IMAGE}:${VER}" bash -c "bash"
+    docker run -it --name ${CONTAINER} --net=host --gpus=all --ipc=host --privileged ${DOCKER_ARGS} "${HUB_REPO}/${IMAGE}:${VER}" bash -c "bash"
 fi
