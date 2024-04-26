@@ -60,6 +60,7 @@ RUN --mount=type=cache,target=/var/cache/apt,id=apt \
     libx11-6 \
     psmisc \
     python3-pip \
+    python-is-python3 \
     software-properties-common \
     && rm -rf /var/lib/apt/lists/*
 
