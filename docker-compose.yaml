@@ -80,10 +80,10 @@ services:
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
       - ${XAUTHORITY:-$HOME/.Xauthority}:/root/.Xauthority
       # Mount the source code
-      - ./${REPO}:/opt/${WORKDIR}/src/${REPO}:rw
+      - ./${REPO}:${HOME}/${WORKDIR}/src/${REPO}:rw
       # Mount catkin build artifacts for faster rebuilds
-      - ./.catkin/build/:/opt/${WORKDIR}/build/:rw
-      - ./.catkin/devel/:/opt/${WORKDIR}/devel/:rw
+      - ./.catkin/build/:${HOME}/${WORKDIR}/build/:rw
+      - ./.catkin/devel/:${HOME}/${WORKDIR}/devel/:rw
     user: ${USERNAME:-devuser}
     command: bash -c "bash"
 #  gpu_prod:
@@ -110,10 +110,10 @@ services:
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
       - ${XAUTHORITY:-$HOME/.Xauthority}:/root/.Xauthority
       # Mount the source code
-      - ./${REPO}:/opt/${WORKDIR}/src/${REPO}:rw
+      - ./${REPO}:${HOME}/${WORKDIR}/src/${REPO}:rw
       # Mount catkin build artifacts for faster rebuilds
-      - ./.catkin/build/:/opt/${WORKDIR}/build/:rw
-      - ./.catkin/devel/:/opt/${WORKDIR}/devel/:rw
+      - ./.catkin/build/:${HOME}/${WORKDIR}/build/:rw
+      - ./.catkin/devel/:${HOME}/${WORKDIR}/devel/:rw
     user: ${USERNAME:-devuser}
     command: bash -c "bash"
 #  cpu_prod:

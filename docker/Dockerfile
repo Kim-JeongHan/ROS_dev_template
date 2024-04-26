@@ -135,13 +135,30 @@ RUN groupadd --gid $GID $USERNAME \
     && catkin_init_workspace /opt/${WORKDIR}/src
 
 WORKDIR /opt/${WORKDIR}
-# TODO : Install Roboe git
-# RUN repo init -u ssh://xn--id-tf2j006a@gerrit.roboetech.com:29418/manifest -b roboe_m_release -m roboe_m_release.xml 
+ENV NVM_VERSION v0.39.7
+ENV NODE_VERSION 18.17.0
+ENV NVM_DIR /home/${USERNAME}/.nvm
+RUN mkdir -p $NVM_DIR
+
+RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
+RUN source $NVM_DIR/nvm.sh \
+    && nvm install $NODE_VERSION \
+    && nvm alias default $NODE_VERSION \
+    && nvm use default
+ENV NODE_PATH $NVM_DIR/v$NODE_VERSION/lib/node_modules
+ENV PATH $NVM_DIR/versions/node/v$NODE_VERSION/bin:$PATH
+RUN curl -L https://npmjs.com/install.sh | bash
+
+RUN mkdir -p /home/${USERNAME}/${WORKDIR}/src \
+    && source /opt/ros/${ROS_DISTRO}/setup.bash \
+    && catkin_init_workspace /home/${USERNAME}/${WORKDIR}/src
+
+WORKDIR /home/${USERNAME}/${WORKDIR}
 
 # Copy the VSCode settings
-COPY ./.vscode /opt/${WORKDIR}/.vscode
+COPY ./.vscode /home/${USERNAME}/${WORKDIR}/.vscode
 USER ${USERNAME}
-RUN echo "source /entrypoint.sh" >> /home/${USERNAME}/.bashrc
+RUN echo -e "source /entrypoint.sh\n\source $NVM_DIR/nvm.sh" >> /home/${USERNAME}/.bashrc
 ######################################
 # gpu prod Image for roboe workspace #
 ######################################
@@ -194,18 +211,14 @@ RUN source $NVM_DIR/nvm.sh \
 ENV NODE_PATH $NVM_DIR/v$NODE_VERSION/lib/node_modules
 ENV PATH $NVM_DIR/versions/node/v$NODE_VERSION/bin:$PATH
 RUN curl -L https://npmjs.com/install.sh | bash
-    
 
-RUN mkdir -p /opt/${WORKDIR}/src \
-    && chown -R ${UID}:${GID} /opt/${WORKDIR} \
+RUN mkdir -p /home/${USERNAME}/${WORKDIR}/src \
     && source /opt/ros/${ROS_DISTRO}/setup.bash \
-    && catkin_init_workspace /opt/${WORKDIR}/src
+    && catkin_init_workspace /home/${USERNAME}/${WORKDIR}/src
 
-WORKDIR /opt/${WORKDIR}
-# TODO : Install Roboe git
-# RUN repo init -u ssh://xn--id-tf2j006a@gerrit.roboetech.com:29418/manifest -b roboe_m_release -m roboe_m_release.xml 
+WORKDIR /home/${USERNAME}/${WORKDIR}
 
 # Copy the VSCode settings
-COPY ./.vscode /opt/${WORKDIR}/.vscode
+COPY ./.vscode /home/${USERNAME}/${WORKDIR}/.vscode
 USER ${USERNAME}
 RUN echo -e "source /entrypoint.sh\n\source $NVM_DIR/nvm.sh" >> /home/${USERNAME}/.bashrc

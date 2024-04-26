@@ -1,17 +1,26 @@
 {
-    // editor settings
-    "editor.tabSize": 4,
-    "editor.rulers": [100],
-    "editor.minimap.enabled": false,
-    "editor.mouseWheelZoom": true,
-    "editor.renderControlCharacters": true,
-    // Set the file associations for ros files
-    "files.associations": {
-        "*.repos": "yaml",
-        "*.world": "xml",
-        "*.xacro": "xml"
-    },
-    "terminal.integrated.scrollback": 1000000,
+  // editor settings
+  "editor.tabSize": 4,
+  "editor.rulers": [100],
+  "editor.minimap.enabled": false,
+  "editor.mouseWheelZoom": true,
+  "editor.renderControlCharacters": true,
+  "editor.formatOnSave": true,
+  "editor.formatOnType": true,
+  "editor.formatOnPaste": true,
+  "editor.formatOnSaveMode": "modifications",
+  "editor.defaultFormatter": "ms-vscode.cpptools",
+  "clang-format.executable": "${workspaceRoot}/.clang-format",
+  "C_Cpp.clang_format_path": "${workspaceRoot}/.clang-format",
+  // Set the file associations for ros files
+  "files.associations": {
+    "*.repos": "yaml",
+    "*.world": "xml",
+    "*.xacro": "xml",
+    "cstdarg": "cpp",
+    "cstdio": "cpp"
+  },
+  "terminal.integrated.scrollback": 1000000,
 
     "python.analysis.extraPaths": [
         "/opt/ros/noetic/lib/python3/dist-packages/"
