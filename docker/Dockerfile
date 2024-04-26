@@ -112,7 +112,7 @@ ARG UID=${UID}
 ARG GID=${GID}
 ARG WORKDIR
 ENV WORKDIR=${WORKDIR}
-ARG PYTHON_VERSION=python3.8
+ARG PYTHON_VERSION
 
 RUN add-apt-repository ppa:deadsnakes/ppa \
     && apt-get update \
@@ -179,7 +179,7 @@ ARG UID=${UID}
 ARG GID=${GID}
 ARG WORKDIR
 ENV WORKDIR=${WORKDIR}
-ARG PYTHON_VERSION=python3.8
+ARG PYTHON_VERSION
 
 RUN add-apt-repository ppa:deadsnakes/ppa \
     && apt-get update \

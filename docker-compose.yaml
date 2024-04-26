@@ -74,6 +74,7 @@ services:
         - GID=${UID:-1000}
         - USERNAME=${USERNAME:-devuser}
         - WORKDIR=${WORKDIR}
+        - PYTHON_VERSION=${PYTHON_VERSION}
     image: ${HUB_REPO}/base-gpu-dev:${VER}
     volumes:
       # Allows graphical programs in the container.
@@ -104,6 +105,7 @@ services:
         - GID=${UID:-1000}
         - USERNAME=${USERNAME:-devuser}
         - WORKDIR=${WORKDIR}
+        - PYTHON_VERSION=${PYTHON_VERSION}
     image: ${HUB_REPO}/base-cpu-dev:${VER}
     volumes:
       # Allows graphical programs in the container.
