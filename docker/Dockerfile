@@ -11,7 +11,7 @@ SHELL ["/bin/bash", "-c"]
 
 ARG DEBIAN_FRONTEND=noninteractive
 
-# Hangul 언어 설정 HOST PC 설정 확인 $locale
+# Hangul Language Settings HOST Check PC Settings $locale
 ENV LANG=en_US.UTF-8
 ENV LC_CTYPE="en_US.UTF-8"
 ENV LC_NUMERIC=ko_KR.UTF-8
@@ -26,11 +26,10 @@ ENV LC_TELEPHONE=ko_KR.UTF-8
 ENV LC_MEASUREMENT=ko_KR.UTF-8
 ENV LC_IDENTIFICATION=ko_KR.UTF-8
 
-# # [230209] apt server to mirror kakao
+# Change ubuntu apt server to kakao
 RUN cd /etc/apt && \
     sed -i 's/archive.ubuntu.com/mirror.kakao.com/g' sources.list && \
     sed -i 's/security.ubuntu.com/mirror.kakao.com/g' sources.list
-
 
 # Install basic apt packages
 RUN --mount=type=cache,target=/var/cache/apt,id=apt \
@@ -67,18 +66,29 @@ RUN --mount=type=cache,target=/var/cache/apt,id=apt \
 RUN python3 -m pip install --upgrade pip
 RUN pip3 install --ignore-installed empy \
     catkin_pkg
+
 # Install Additional ROS packages
 RUN --mount=type=cache,target=/var/cache/apt,id=apt \
     apt-get update && apt-get upgrade -y \
     && apt-get install -q -y --no-install-recommends \
-    ros-${ROS_DISTRO}-rviz 
-
+    ros-${ROS_DISTRO}-rviz
 
 # Remove display warnings
 RUN mkdir /tmp/runtime-root
 ENV XDG_RUNTIME_DIR "/tmp/runtime-root"
 RUN chmod -R 0700 /tmp/runtime-root
 ENV NO_AT_BRIDGE 1
+
+# TO-DO
+# 1. VENV ENV SHOULD BE APPLIED
+# 2. catkin_ws Directory Setting
+#   2.1 dev: /home/${USER}/catkin_ws
+#   2.2 prod: /opt/catkin_ws
+# # ROS directory will be /opt/ros/noetic
+# 3. Build will be performed using catkin_make then catkin build could be used
+# 4. NVM (npm, pm2, pnpm) should be considered about move or remove installation
+#
+#
 
 COPY ./docker/entrypoint.sh /
 ENTRYPOINT ["/entrypoint.sh"]
@@ -100,8 +110,7 @@ FROM base as cpu
 FROM cpu as cpu-prod
 
 WORKDIR /opt
-# TODO : Install Roboe git
-
+# TODO : TBD
 
 #####################################
 # cpu dev Image for roboe workspace #
@@ -150,11 +159,11 @@ ENV NODE_PATH $NVM_DIR/v$NODE_VERSION/lib/node_modules
 ENV PATH $NVM_DIR/versions/node/v$NODE_VERSION/bin:$PATH
 RUN curl -L https://npmjs.com/install.sh | bash
 
-RUN mkdir -p /home/${USERNAME}/${WORKDIR}/src \
-    && source /opt/ros/${ROS_DISTRO}/setup.bash \
-    && catkin_init_workspace /home/${USERNAME}/${WORKDIR}/src
+#RUN mkdir -p /home/${USERNAME}/${WORKDIR}/src \
+#    && source /opt/ros/${ROS_DISTRO}/setup.bash \
+#    && catkin_init_workspace /home/${USERNAME}/${WORKDIR}/src
 
-WORKDIR /home/${USERNAME}/${WORKDIR}
+#WORKDIR /home/${USERNAME}/${WORKDIR}
 
 # Copy the VSCode settings
 COPY ./.vscode /home/${USERNAME}/${WORKDIR}/.vscode
