@@ -1,3 +1,7 @@
+<<<<<<< HEAD
+cudnn-11.3-linux-x64-v8.2.1.32.tgz
+id_rsa
+=======
 # Created by https://www.toptal.com/developers/gitignore/api/git,linux,windows,macos,ros2,visualstudiocode,jetbrains+all,c++,python,matlab,kicad,c,tex,vim,venv,pycharm+all,clion+all,latex,ninja,cmake,bazel,node
 # Edit at https://www.toptal.com/developers/gitignore?templates=git,linux,windows,macos,ros2,visualstudiocode,jetbrains+all,c++,python,matlab,kicad,c,tex,vim,venv,pycharm+all,clion+all,latex,ninja,cmake,bazel,node
 
@@ -1306,3 +1310,4 @@ $RECYCLE.BIN/
 .catkin/
 
 # End of https://www.toptal.com/developers/gitignore/api/git,linux,windows,macos,ros2,visualstudiocode,jetbrains+all,c++,python,matlab,kicad,c,tex,vim,venv,pycharm+all,clion+all,latex,ninja,cmake,bazel,node
+>>>>>>> f12e299e07e3b39e87e302630088994c66b0e0cf

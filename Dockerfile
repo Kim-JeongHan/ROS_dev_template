@@ -12,7 +12,6 @@ ENV LANG en_US.UTF-8
 # install utillity
 RUN apt update
 RUN apt install -y \
-    tmux \
     curl \
     wget \ 
     vim \
@@ -107,44 +106,21 @@ RUN echo "source /home/${UNAME}/catkin_ws/devel/setup.bash" >> ~/.bashrc
 RUN /bin/bash -c "source ~/.bashrc"
 RUN ~/vdx36/bin/pip install empy catkin_pkg numpy PyYAML rospkg opencv-python matplotlib
 
-# USER ${UNAME}
-# RUN mkdir -p -m 0700 /home/${UNAME}/.ssh \
-#   && ssh-keyscan github.com >> /home/${UNAME}/.ssh/known_hosts
-# ADD id_rsa /home/${UNAME}/.ssh/id_rsa
-# USER root
-# RUN chown roboe:root /home/${UNAME}/.ssh/id_rsa
-# RUN chmod 600 /home/${UNAME}/.ssh/id_rsa
-# RUN chmod 644 /home/${UNAME}/.ssh/known_hosts
+RUN wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/cuda-ubuntu2004.pin
+RUN sudo mv cuda-ubuntu2004.pin /etc/apt/preferences.d/cuda-repository-pin-600
+RUN sudo apt-key adv --fetch-keys https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/3bf863cc.pub
+RUN sudo add-apt-repository "deb https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/ /"
+RUN sudo apt update 
+RUN sudo DEBIAN_FRONTEND=noninteractive apt install -y cuda-11-3
 
-# RUN ssh-keygen -t rsa -C "jisung.ko@roboetech.com"
-RUN sudo apt -y install openssh-client
-RUN mkdir -p -m 0700 /home/${UNAME}/.ssh
-RUN ssh-keygen -q -t rsa -C "jisung.ko@roboetech.com"
+RUN echo 'export PATH=/usr/local/cuda-11.3/bin:$PATH' >> ~/.bashrc
+RUN echo 'export LD_LIBRARY_PATH=/usr/local/cuda-11.3/lib64:$LD_LIBRARY_PATH' >> ~/.bashrc
 
-WORKDIR /home/${UNAME}/catkin_ws/src
-RUN git clone git@github.com:roboetech/roboenet.git
-# RUN git clone -b noetic-devel --single-branch https://github.com/doosan-robotics/doosan-robot
-# RUN git clone https://github.com/wjwwood/serial.git
-# RUN rosdep install --from-paths doosan-robot --ignore-src --rosdistro noetic -r -y
+ADD cudnn-11.3-linux-x64-v8.2.1.32.tgz /home/${UNAME}/catkin_ws/etc/
+RUN sudo cp ~/catkin_ws/etc/cuda/include/* /usr/local/cuda-11.3/include
+RUN sudo cp -P ~/catkin_ws/etc/cuda/lib64/* /usr/local/cuda-11.3/lib64
+RUN sudo chmod a+r /usr/local/cuda-11.3/lib64/libcudnn*
 
+RUN sudo DEBIAN_FRONTEND=noninteractive apt -y install terminator
 
-# WORKDIR /home/${UNAME}/catkin_ws/src/roboenet
-# RUN sh install.sh all
-# RUN /bin/bash -c '. /opt/ros/noetic/setup.bash; cd /home/roboe/catkin_ws; catkin_make'
-
-# RUN wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/cuda-ubuntu2004.pin
-# RUN sudo mv cuda-ubuntu2004.pin /etc/apt/preferences.d/cuda-repository-pin-600
-# RUN sudo apt-key adv --fetch-keys https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/3bf863cc.pub
-# RUN sudo add-apt-repository "deb https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/ /"
-# RUN sudo apt update 
-# RUN sudo DEBIAN_FRONTEND=noninteractive apt install -y cuda-11-3
-
-# RUN echo 'export PATH=/usr/local/cuda-11.3/bin:$PATH' >> ~/.bashrc
-# RUN echo 'export LD_LIBRARY_PATH=/usr/local/cuda-11.3/lib64:$LD_LIBRARY_PATH' >> ~/.bashrc
-
-# ADD cudnn-11.3-linux-x64-v8.2.1.32.tgz /home/${UNAME}/catkin_ws/etc/
-# RUN sudo cp ~/catkin_ws/etc/cuda/include/* /usr/local/cuda-11.3/include
-# RUN sudo cp -P ~/catkin_ws/etc/cuda/lib64/* /usr/local/cuda-11.3/lib64
-# RUN sudo chmod a+r /usr/local/cuda-11.3/lib64/libcudnn*
-
-# RUN sudo DEBIAN_FRONTEND=noninteractive apt -y install terminator
+RUN ~/vdx36/bin/pip install --upgrade --force-reinstall tensorflow==2.6.0 keras==2.6.0

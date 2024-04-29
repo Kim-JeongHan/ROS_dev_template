@@ -2,7 +2,7 @@
 
 USER_UID=$(id -u)
 TAG='focal-noetic-dev'
-IMAGE='roboe:imageV1' # 220811
+IMAGE='roboe:image_V1' # 220818
 TTY='--device=/dev/ttyACM0'
 USER='roboe'
 
