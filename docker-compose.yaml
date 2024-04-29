@@ -72,7 +72,7 @@ services:
       args:
         - UID=${UID:-1000}
         - GID=${UID:-1000}
-        - USERNAME=${USERNAME:-devuser}
+        - USERNAME=linux
         - WORKDIR=${WORKDIR}
         - PYTHON_VERSION=${PYTHON_VERSION}
     image: ${HUB_REPO}/base-gpu-dev:${VER}
@@ -103,7 +103,7 @@ services:
       args:
         - UID=${UID:-1000}
         - GID=${UID:-1000}
-        - USERNAME=${USERNAME:-devuser}
+        - USERNAME=linux
         - WORKDIR=${WORKDIR}
         - PYTHON_VERSION=${PYTHON_VERSION}
     image: ${HUB_REPO}/base-cpu-dev:${VER}

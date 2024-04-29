@@ -139,12 +139,7 @@ RUN groupadd --gid $GID $USERNAME \
     && mkdir -p /home/${USERNAME} \
     && chown -R ${UID}:${GID} /home/${USERNAME}
 
-    RUN mkdir -p /opt/${WORKDIR}/src \
-    && chown -R ${UID}:${GID} /opt/${WORKDIR} \
-    && source /opt/ros/${ROS_DISTRO}/setup.bash \
-    && catkin_init_workspace /opt/${WORKDIR}/src
 
-WORKDIR /opt/${WORKDIR}
 ENV NVM_VERSION v0.39.7
 ENV NODE_VERSION 18.17.0
 ENV NVM_DIR /home/${USERNAME}/.nvm
@@ -159,11 +154,11 @@ ENV NODE_PATH $NVM_DIR/v$NODE_VERSION/lib/node_modules
 ENV PATH $NVM_DIR/versions/node/v$NODE_VERSION/bin:$PATH
 RUN curl -L https://npmjs.com/install.sh | bash
 
-#RUN mkdir -p /home/${USERNAME}/${WORKDIR}/src \
-#    && source /opt/ros/${ROS_DISTRO}/setup.bash \
-#    && catkin_init_workspace /home/${USERNAME}/${WORKDIR}/src
+RUN mkdir -p /home/${USERNAME}/${WORKDIR}/src \
+   && source /opt/ros/${ROS_DISTRO}/setup.bash \
+   && catkin_init_workspace /home/${USERNAME}/${WORKDIR}/src
 
-#WORKDIR /home/${USERNAME}/${WORKDIR}
+WORKDIR /home/${USERNAME}/${WORKDIR}
 
 # Copy the VSCode settings
 COPY ./.vscode /home/${USERNAME}/${WORKDIR}/.vscode

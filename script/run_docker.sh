@@ -39,10 +39,10 @@ DOCKER_VOLUMES="
 --volume="/dev:/dev" \
 --volume="${HOME}/.ssh:/home/linux/.ssh:ro" \
 --volume="${HOME}/.gitconfig:/home/linux/.gitconfig:ro" \
---volume="${HERE}/.catkin/build:/opt/${WORKDIR}/build" \
---volume="${HERE}/.catkin/devel:/opt/${WORKDIR}/devel" \
---volume="${HERE}/.catkin/install:/opt/${WORKDIR}/install" \
---volume="${HERE}/${REPO}:/opt/${WORKDIR}/src/${REPO}" \
+--volume="${HERE}/.catkin/build:/home/linux/${WORKDIR}/build" \
+--volume="${HERE}/.catkin/devel:/home/linux/${WORKDIR}/devel" \
+--volume="${HERE}/.catkin/install:/home/linux/${WORKDIR}/install" \
+--volume="${HERE}/${REPO}:/home/linux/${WORKDIR}/src/${REPO}" \
 --user=$(id -u):$(id -g) \
 "
 DOCKER_ENV_VARS="
