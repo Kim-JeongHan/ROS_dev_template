@@ -21,8 +21,18 @@ RUN mkdir -p /home/${USERNAME}/${WORKDIR}/src \
     && source /opt/ros/${ROS_DISTRO}/setup.bash \
     && catkin_init_workspace /home/${USERNAME}/${WORKDIR}/src
 WORKDIR /home/${USERNAME}
+
+# Create virtual env & Update pip
 RUN python3.11 -m venv vdx311
-RUN echo -e "source /entrypoint.sh\n\source /opt/.nvm/nvm.sh" >> /home/${USERNAME}/.bashrc
+RUN /bin/bash -c "virtualenv vdx311 --python=python3.11" && \
+    /bin/bash -c "source ~/vdx311/bin/activate; curl -sS https://bootstrap.pypa.io/get-pip.py | python3.11" && \
+    echo 'if [[ -n "$VIRTUAL_ENV" ]]; then' >> ~/.bashrc && \
+    echo '    source ~/vdx311/bin/activate' >> ~/.bashrc && \
+    echo 'fi' >> ~/.bashrc && \
+    echo "deactivate"
+
+# Environment Setup
+RUN echo "source /opt/ros/noetic/setup.bash" >> ~/.bashrc
 
 ### VISION ###
 # Install Ensenso SDK & Ueye driver
@@ -52,9 +62,7 @@ RUN mkdir -p ~/catkin_ws/dev/Zivid && \
 WORKDIR ~/catkin_ws/src/vision/zivid-ros/SRC/python_zivid/zivid-python
 RUN pip install .
 
+RUN echo -e "source /entrypoint.sh\n\source /opt/.nvm/nvm.sh" >> /home/${USERNAME}/.bashrc
+
 # Change base prompt terminal color
 RUN echo 'PS1="\033[1;36m\]\u\[\033[1;31m\][D]\[\033[1;32m\]$CONTAINER:\[\033[1;35m\]\w\[\033[1;31m\]\$\[\033[0m\] "' >> /home/${USERNAME}/.bashrc
-
-
-
-
