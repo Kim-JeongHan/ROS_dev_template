@@ -179,7 +179,6 @@ RUN update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.8 1 
     && update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.11 2 \
     && update-alternatives --set python3 /usr/bin/${PYTHON_VERSION}
 
-
 ENV NVM_VERSION v0.39.7
 ENV NODE_VERSION 18.17.0
 ENV NVM_DIR /opt/.nvm
@@ -197,3 +196,5 @@ RUN curl -L https://npmjs.com/install.sh | bash
 # Copy the VSCode settings
 COPY ./.vscode /opt/.vscode
 
+# Change base prompt terminal color
+RUN echo 'PS1="\[\033[1;36m\]\u\[\033[1;31m\][D]\[\033[1;32m\]$CONTAINER_NAME:\[\033[1;35m\]\w\[\033[1;31m\]\$\[\033[0m\] "' >> /home/${USERNAME}/.bashrc
