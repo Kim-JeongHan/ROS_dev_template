@@ -24,4 +24,7 @@ WORKDIR /home/${USERNAME}
 RUN python3.11 -m venv vdx311
 RUN echo -e "source /entrypoint.sh\n\source /opt/.nvm/nvm.sh" >> /home/${USERNAME}/.bashrc
 
+# Change base prompt terminal color
+RUN echo 'PS1="[\033[1;36m\]\u\[\033[1;31m\][D]\[\033[1;32m\]$CONTAINER:\[\033[1;35m\]\w\[\033[1;31m\]\$\[\033[0m\] "' >> /home/${USERNAME}/.bashrc
+
 

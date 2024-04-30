@@ -196,3 +196,4 @@ RUN curl -L https://npmjs.com/install.sh | bash
 # Copy the VSCode settings
 COPY ./.vscode /opt/.vscode
 
+
