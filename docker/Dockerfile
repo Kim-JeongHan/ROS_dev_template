@@ -117,32 +117,25 @@ WORKDIR /opt
 #####################################
 FROM cpu as cpu-dev
 
-ARG USERNAME
-ARG UID=${UID}
-ARG GID=${GID}
-ARG WORKDIR
-ENV WORKDIR=${WORKDIR}
 ARG PYTHON_VERSION
 
 RUN add-apt-repository ppa:deadsnakes/ppa \
     && apt-get update \
-    && apt-get install -y python3.11 
+    && apt-get install -y  python3.11 \
+    python3.11-venv \
+    python3.11-dev \
+    python3.11-tk \
+    virtualenv \
+    terminator
+
 RUN update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.8 1 \
     && update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.11 2 \
     && update-alternatives --set python3 /usr/bin/${PYTHON_VERSION}
 
-# Create new user and home directory
-RUN groupadd --gid $GID $USERNAME \
-    && useradd --uid ${GID} --gid ${UID} --create-home ${USERNAME} \
-    && echo ${USERNAME} ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/${USERNAME} \
-    && chmod 0440 /etc/sudoers.d/${USERNAME} \
-    && mkdir -p /home/${USERNAME} \
-    && chown -R ${UID}:${GID} /home/${USERNAME}
-
 
 ENV NVM_VERSION v0.39.7
 ENV NODE_VERSION 18.17.0
-ENV NVM_DIR /home/${USERNAME}/.nvm
+ENV NVM_DIR /opt/.nvm
 RUN mkdir -p $NVM_DIR
 
 RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
@@ -154,16 +147,8 @@ ENV NODE_PATH $NVM_DIR/v$NODE_VERSION/lib/node_modules
 ENV PATH $NVM_DIR/versions/node/v$NODE_VERSION/bin:$PATH
 RUN curl -L https://npmjs.com/install.sh | bash
 
-RUN mkdir -p /home/${USERNAME}/${WORKDIR}/src \
-   && source /opt/ros/${ROS_DISTRO}/setup.bash \
-   && catkin_init_workspace /home/${USERNAME}/${WORKDIR}/src
-
-WORKDIR /home/${USERNAME}/${WORKDIR}
-
 # Copy the VSCode settings
-COPY ./.vscode /home/${USERNAME}/${WORKDIR}/.vscode
-USER ${USERNAME}
-RUN echo -e "source /entrypoint.sh\n\source $NVM_DIR/nvm.sh" >> /home/${USERNAME}/.bashrc
+COPY ./.vscode /opt/.vscode
 ######################################
 # gpu prod Image for roboe workspace #
 ######################################
@@ -179,33 +164,25 @@ WORKDIR /opt
 #####################################
 FROM gpu as gpu-dev
 
-ARG USERNAME=devuser
-ARG UID=${UID}
-ARG GID=${GID}
-ARG WORKDIR
-ENV WORKDIR=${WORKDIR}
 ARG PYTHON_VERSION
 
 RUN add-apt-repository ppa:deadsnakes/ppa \
     && apt-get update \
-    && apt-get install -y python3.11
+    && apt-get install -y  python3.11 \
+    python3.11-venv \
+    python3.11-dev \
+    python3.11-tk \
+    virtualenv \
+    terminator
+
 RUN update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.8 1 \
     && update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.11 2 \
     && update-alternatives --set python3 /usr/bin/${PYTHON_VERSION}
 
 
-# Create new user and home directory
-RUN groupadd --gid $GID $USERNAME \
-    && useradd --uid ${GID} --gid ${UID} --create-home ${USERNAME} \
-    && echo ${USERNAME} ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/${USERNAME} \
-    && chmod 0440 /etc/sudoers.d/${USERNAME} \
-    && mkdir -p /home/${USERNAME} \
-    && chown -R ${UID}:${GID} /home/${USERNAME}
-
-WORKDIR /home/${USERNAME}
 ENV NVM_VERSION v0.39.7
 ENV NODE_VERSION 18.17.0
-ENV NVM_DIR /home/${USERNAME}/.nvm
+ENV NVM_DIR /opt/.nvm
 RUN mkdir -p $NVM_DIR
 
 RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
@@ -217,13 +194,6 @@ ENV NODE_PATH $NVM_DIR/v$NODE_VERSION/lib/node_modules
 ENV PATH $NVM_DIR/versions/node/v$NODE_VERSION/bin:$PATH
 RUN curl -L https://npmjs.com/install.sh | bash
 
-RUN mkdir -p /home/${USERNAME}/${WORKDIR}/src \
-    && source /opt/ros/${ROS_DISTRO}/setup.bash \
-    && catkin_init_workspace /home/${USERNAME}/${WORKDIR}/src
-
-WORKDIR /home/${USERNAME}/${WORKDIR}
-
 # Copy the VSCode settings
-COPY ./.vscode /home/${USERNAME}/${WORKDIR}/.vscode
-USER ${USERNAME}
-RUN echo -e "source /entrypoint.sh\n\source $NVM_DIR/nvm.sh" >> /home/${USERNAME}/.bashrc
+COPY ./.vscode /opt/.vscode
+

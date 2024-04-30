@@ -81,11 +81,11 @@ services:
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
       - ${XAUTHORITY:-$HOME/.Xauthority}:/root/.Xauthority
       # Mount the source code
-      - ./${REPO}:${HOME}/${WORKDIR}/src/${REPO}:rw
-      # Mount catkin build artifacts for faster rebuilds
-      - ./.catkin/build/:${HOME}/${WORKDIR}/build/:rw
-      - ./.catkin/devel/:${HOME}/${WORKDIR}/devel/:rw
-    user: ${USERNAME:-devuser}
+      # - ./${REPO}:${HOME}/${WORKDIR}/src/${REPO}:rw
+      # # Mount catkin build artifacts for faster rebuilds
+      # - ./.catkin/build/:${HOME}/${WORKDIR}/build/:rw
+      # - ./.catkin/devel/:${HOME}/${WORKDIR}/devel/:rw
+    # user: linux
     command: bash -c "bash"
 #  gpu_prod:
 #    extends: gpu
